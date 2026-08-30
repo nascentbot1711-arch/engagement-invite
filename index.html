@@ -408,6 +408,41 @@
   footer { text-align: center; padding: 20px 20px 30px; background: var(--paper); }
   .footer-note { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px; color: var(--maroon); }
   .footer-small { font-size: 10.5px; color: var(--ink); opacity: 0.45; margin-top: 8px; }
+
+  .music-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .music-tooltip {
+    background: var(--maroon);
+    color: var(--gold-light);
+    font-family: 'Poppins', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--gold);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    white-space: nowrap;
+    animation: pulseTooltip 2s infinite alternate;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+  }
+
+  .music-tooltip.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  @keyframes pulseTooltip {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-4px); }
+  }
 </style>
 </head>
 <body>
@@ -520,9 +555,10 @@
     + Google Calendar
   </a>
 
-  <a class="calendar-btn apple-btn" id="apple-cal-btn" download="Engagement-RathnaPriya-Sukesh.ics" style="background: var(--leaf-dark);">
-    + Apple / Outlook
-  </a>
+ <!-- Apple / Outlook Button -->
+<a class="calendar-btn apple-btn" id="apple-cal-btn" style="background: var(--leaf-dark); cursor: pointer;">
+  + Apple / Outlook
+</a>
 </div>
     <div class="divider-line"></div>
 
@@ -582,11 +618,21 @@
   </footer>
 </div>
 
-<div id="music-control" onclick="toggleAudio()" style="position: fixed; bottom: 20px; right: 20px; z-index: 999; background: var(--maroon); color: var(--gold-light); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; border: 1.5px solid var(--gold);">
-  <span id="music-icon" style="font-size: 18px;">🎵</span>
+<!-- Music Container with Button and Tooltip -->
+<div class="music-container">
+  <!-- Tooltip Popup -->
+  <div id="music-tooltip" class="music-tooltip">
+    🎵 Tap to play music
+  </div>
+
+<!-- Floating Audio Button -->
+  <div id="music-control" onclick="toggleAudio()" style="background: var(--maroon); color: var(--gold-light); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,0.35); cursor: pointer; border: 1.5px solid var(--gold); flex-shrink: 0;">
+    <span id="music-icon" style="font-size: 18px;">🎵</span>
+  </div>
 </div>
 
-<audio id="bg-music" loop>
+<!-- Audio Source -->
+<audio id="bg-music" loop preload="auto">
   <source src="background-music.mp3" type="audio/mpeg">
 </audio>
 
@@ -641,21 +687,41 @@
   updateCountdown();
   setInterval(updateCountdown, 1000);
 
-// Generate .ics calendar file dynamically for Apple & Outlook users
-const icsData = 
-  "BEGIN:VCALENDAR\n" +
-  "VERSION:2.0\n" +
-  "PRODID:-//Engagement Invitation//EN\n" +
-  "BEGIN:VEVENT\n" +
-  "SUMMARY:Engagement Ceremony - Rathna Priya & Sukesh\n" +
-  "DESCRIPTION:Engagement ceremony of Chi. La. Sow. Gadamchetty Rathna Priya and Chi. Perla Sukesh.\n" +
-  "LOCATION:Green Apple Banquet Hall\\, 50 Park Road\\, Soundarya Colony\\, Anna Nagar West Extension\\, Chennai\\, Tamil Nadu 600101\n" +
-  "DTSTART:20260923T123000Z\n" +
-  "DTEND:20260923T140000Z\n" +
-  "END:VEVENT\n" +
-  "END:VCALENDAR";
+document.getElementById('apple-cal-btn').addEventListener('click', function(e) {
+  e.preventDefault();
 
-document.getElementById('apple-cal-btn').href = 'data:text/calendar;charset=utf8,' + encodeURIComponent(icsData);
+  const icsData = 
+    "BEGIN:VCALENDAR\r\n" +
+    "VERSION:2.0\r\n" +
+    "PRODID:-//Engagement Invitation//EN\r\n" +
+    "CALSCALE:GREGORIAN\r\n" +
+    "METHOD:PUBLISH\r\n" +
+    "BEGIN:VEVENT\r\n" +
+    "SUMMARY:Engagement Ceremony - Rathna Priya & Sukesh\r\n" +
+    "DESCRIPTION:Engagement ceremony of Chi. La. Sow. Gadamchetty Rathna Priya and Chi. Perla Sukesh.\r\n" +
+    "LOCATION:Green Apple Banquet Hall, 50 Park Road, Soundarya Colony, Anna Nagar West Extension, Chennai, Tamil Nadu 600101\r\n" +
+    "DTSTART:20260923T123000Z\r\n" +
+    "DTEND:20260923T140000Z\r\n" +
+    "END:VEVENT\r\n" +
+    "END:VCALENDAR";
+
+  // Create a Blob file for mobile compatibility
+  const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8;' });
+  
+  // Mobile Safari / iOS fallback handling
+  if (navigator.msSaveBlob) {
+    navigator.msSaveBlob(blob, 'Engagement-RathnaPriya-Sukesh.ics');
+  } else {
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.setAttribute('download', 'Engagement-RathnaPriya-Sukesh.ics');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+});
+
+
 </script>
 
 </body>
