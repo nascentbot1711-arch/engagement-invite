@@ -11,12 +11,6 @@
 <meta property="og:description" content="Join us for the Nischitardham on Wednesday, 23rd September 2026 at Green Apple Banquet Hall, Chennai.">
 <meta property="og:type" content="website">
 
-<meta property="og:image" content="https://nascentbot1711-arch.github.io/engagement-invite/og-image.jpg">
-<meta property="og:image:secure_url" content="https://nascentbot1711-arch.github.io/engagement-invite/og-image.jpg">
-<meta property="og:image:type" content="image/jpeg">
-<meta property="og:image:width" content="600">
-<meta property="og:image:height" content="600">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@300;400;500;600&family=Yatra+One&display=swap" rel="stylesheet">
@@ -521,8 +515,15 @@
       <div class="count-unit"><span class="count-num" id="cd-secs">00</span><span class="count-label">Sec</span></div>
     </div>
 
-    <a class="calendar-btn" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Engagement%20Ceremony%20-%20Rathna%20Priya%20%26%20Sukesh&dates=20260923T123000Z/20260923T140000Z&details=Engagement%20ceremony%20of%20Gadamchetty%20Rathna%20Priya%20and%20Perla%20Sukesh.&location=Green%20Apple%20Banquet%20Hall%2C%20Chennai" target="_blank" rel="noopener">+ Add to Calendar</a>
+    <div class="calendar-group" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px;">
+  <a class="calendar-btn" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Engagement%20Ceremony%20-%20Rathna%20Priya%20%26%20Sukesh&dates=20260923T123000Z/20260923T140000Z&details=Engagement%20ceremony%20of%20Chi.%20La.%20Sow.%20Gadamchetty%20Rathna%20Priya%20and%20Chi.%20Perla%20Sukesh.&location=Green%20Apple%20Banquet%20Hall%2C%20Chennai" target="_blank" rel="noopener">
+    + Google Calendar
+  </a>
 
+  <a class="calendar-btn apple-btn" id="apple-cal-btn" download="Engagement-RathnaPriya-Sukesh.ics" style="background: var(--leaf-dark);">
+    + Apple / Outlook
+  </a>
+</div>
     <div class="divider-line"></div>
 
     <div class="section-label">Venue</div>
@@ -553,19 +554,25 @@
     </div>
   </section>
 
-  <!-- CONTACT -->
+  <!-- CONTACT (SIDE-BY-SIDE) -->
   <section class="contact">
     <div class="section-label">Point of Contact</div>
-    <p>For any queries, please feel free to reach out:</p>
-    <div class="contact-list">
+    <div class="contact-list" style="margin-top: 8px;">
+
+      <!-- Groom's Father -->
       <a class="contact-card" href="tel:+919444107048">
-        <span class="contact-name">P. Appaswamy <span class="contact-role">(Groom's Father)</span></span>
+        <span class="contact-name">P. Appaswamy</span>
+        <span class="contact-role">(Groom's Father)</span>
         <span class="contact-number">+91 94441 07048</span>
       </a>
+      
+      <!-- Bride's Father -->
       <a class="contact-card" href="tel:+919840042958">
-        <span class="contact-name">G.V. Ramalingeswar <span class="contact-role">(Bride's Father)</span></span>
+        <span class="contact-name">G.V. Ramalingeswar</span>
+        <span class="contact-role">(Bride's Father)</span>
         <span class="contact-number">+91 98400 42958</span>
       </a>
+
     </div>
   </section>
 
@@ -575,7 +582,46 @@
   </footer>
 </div>
 
+<div id="music-control" onclick="toggleAudio()" style="position: fixed; bottom: 20px; right: 20px; z-index: 999; background: var(--maroon); color: var(--gold-light); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; border: 1.5px solid var(--gold);">
+  <span id="music-icon" style="font-size: 18px;">🎵</span>
+</div>
+
+<audio id="bg-music" loop>
+  <source src="background-music.mp3" type="audio/mpeg">
+</audio>
+
 <script>
+
+    const audio = document.getElementById('bg-music');
+    const musicIcon = document.getElementById('music-icon');
+    let isPlaying = false;
+
+    function toggleAudio() {
+      if (isPlaying) {
+        audio.pause();
+        musicIcon.textContent = "🎵";
+        isPlaying = false;
+      } else {
+        audio.play().then(() => {
+          musicIcon.textContent = "⏸";
+          isPlaying = true;
+        }).catch(err => {
+          console.log("Playback prevented:", err);
+        });
+      }
+    }
+
+    // Play on the guest's very first tap on the screen
+    document.addEventListener('click', function startOnFirstTap() {
+      if (!isPlaying) {
+        audio.play().then(() => {
+          musicIcon.textContent = "⏸";
+          isPlaying = true;
+        }).catch(() => {});
+      }
+    }, { once: true });
+
+
   const eventDate = new Date("2026-09-23T18:00:00");
   function updateCountdown() {
     const now = new Date();
@@ -594,6 +640,22 @@
   }
   updateCountdown();
   setInterval(updateCountdown, 1000);
+
+// Generate .ics calendar file dynamically for Apple & Outlook users
+const icsData = 
+  "BEGIN:VCALENDAR\n" +
+  "VERSION:2.0\n" +
+  "PRODID:-//Engagement Invitation//EN\n" +
+  "BEGIN:VEVENT\n" +
+  "SUMMARY:Engagement Ceremony - Rathna Priya & Sukesh\n" +
+  "DESCRIPTION:Engagement ceremony of Chi. La. Sow. Gadamchetty Rathna Priya and Chi. Perla Sukesh.\n" +
+  "LOCATION:Green Apple Banquet Hall\\, 50 Park Road\\, Soundarya Colony\\, Anna Nagar West Extension\\, Chennai\\, Tamil Nadu 600101\n" +
+  "DTSTART:20260923T123000Z\n" +
+  "DTEND:20260923T140000Z\n" +
+  "END:VEVENT\n" +
+  "END:VCALENDAR";
+
+document.getElementById('apple-cal-btn').href = 'data:text/calendar;charset=utf8,' + encodeURIComponent(icsData);
 </script>
 
 </body>
